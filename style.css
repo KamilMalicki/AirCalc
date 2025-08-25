@@ -7,7 +7,7 @@
     --btn-active-bg: #e0e0e0;
     --operator-bg: #3b82f6; 
     --operator-text: #fff;
-    --operator-active-bg: #2563eb;
+    --operator-active-bg: #2563eb; 
     --equal-bg: #3b82f6; 
     --equal-active-bg: #2563eb; 
     --clear-bg: #d3d3d3;
@@ -85,7 +85,6 @@ body {
 .btn-equal {
     background-color: var(--equal-bg);
     color: var(--operator-text);
-    grid-column: span 2;
 }
 
 .btn:active {
@@ -109,24 +108,26 @@ body {
     background-color: var(--equal-active-bg);
 }
 
+/* Pozycjonowanie przycisków */
 .zero {
     grid-column: span 2;
 }
 
+/* Nowe style dla rozsuwanych opcji */
 .additional-options {
-    display: grid;
     grid-column: 1 / -1;
+    display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     overflow: hidden;
     max-height: 0;
     padding: 0;
-    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
 }
 
 .additional-options.visible {
-    max-height: 200px;
-    padding: 0 0 12px 0;
+    max-height: 200px; /* Wystarczająca wysokość dla 2 rzędów przycisków */
+    padding-bottom: 12px;
 }
 
 .btn-expand {
@@ -134,4 +135,9 @@ body {
     color: var(--text-color);
     font-size: 1.5em;
     font-weight: bold;
+}
+
+.btn-sci, .btn-prog {
+    background-color: var(--btn-bg);
+    color: var(--text-color);
 }
