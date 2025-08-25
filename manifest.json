@@ -13,7 +13,7 @@
             "type": "image/png"
         },
         {
-            "src": "/AirCalc/images/image-512.png",
+            "src": "/AirCalc/images/image-192.png",
             "sizes": "512x512",
             "type": "image/png"
         }
