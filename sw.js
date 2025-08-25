@@ -1,33 +1,31 @@
-const CACHE_NAME = 'pwa-calculator-v1';
+const CACHE_NAME = 'kalkulator-v1';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/script.js',
-    '/manifest.json',
-    '/image-192.png',
-    '/image-512.png'
+    '/AirCalc/',
+    '/AirCalc/index.html',
+    '/AirCalc/style.css',
+    '/AirCalc/script.js',
+    '/AirCalc/manifest.json'
 ];
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-        .then(cache => {
-            console.log('Cache otwarty');
-            return cache.addAll(urlsToCache);
-        })
+            .then(cache => {
+                console.log('Cache otwarty');
+                return cache.addAll(urlsToCache);
+            })
     );
 });
 
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
-        .then(response => {
-            if (response) {
-                return response;
-            }
-            return fetch(event.request);
-        })
+            .then(response => {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request);
+            })
     );
 });
 

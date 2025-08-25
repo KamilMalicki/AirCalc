@@ -1,106 +1,117 @@
-const calculator = document.querySelector('.calculator');
-const calculatorScreen = calculator.querySelector('.calculator-screen');
-const buttons = calculator.querySelector('.calculator-buttons');
+document.addEventListener('DOMContentLoaded', () => {
+    const display = document.querySelector('.display');
+    const buttons = document.querySelector('.buttons');
+    let currentInput = '0';
+    let firstOperand = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
 
-let currentValue = '0';
-let firstValue = null;
-let operator = null;
-let waitingForSecondValue = false;
-
-function updateScreen() {
-    calculatorScreen.value = currentValue;
-}
-
-function handleOperator(nextOperator) {
-    const inputValue = parseFloat(currentValue);
-
-    if (operator && waitingForSecondValue) {
-        operator = nextOperator;
-        return;
+    function updateDisplay() {
+        display.textContent = currentInput;
     }
 
-    if (firstValue === null) {
-        firstValue = inputValue;
-    } else if (operator) {
-        const result = operate(firstValue, inputValue, operator);
-        currentValue = String(result);
-        firstValue = result;
-    }
+    buttons.addEventListener('click', (event) => {
+        const { target } = event;
+        if (!target.matches('button')) {
+            return;
+        }
 
-    waitingForSecondValue = true;
-    operator = nextOperator;
-    updateScreen();
-}
+        if (target.classList.contains('number')) {
+            inputDigit(target.textContent);
+            updateDisplay();
+            return;
+        }
 
-function operate(num1, num2, op) {
-    if (op === '+') return num1 + num2;
-    if (op === '-') return num1 - num2;
-    if (op === '*') return num1 * num2;
-    if (op === '/') return num1 / num2;
-}
+        if (target.classList.contains('decimal')) {
+            inputDecimal(target.textContent);
+            updateDisplay();
+            return;
+        }
 
-function handleNumber(number) {
-    if (waitingForSecondValue === true) {
-        currentValue = number;
-        waitingForSecondValue = false;
-    } else {
-        currentValue = currentValue === '0' ? number : currentValue + number;
-    }
-    updateScreen();
-}
+        if (target.classList.contains('operator')) {
+            handleOperator(target.textContent);
+            updateDisplay();
+            return;
+        }
 
-function handleDecimal(dot) {
-    if (waitingForSecondValue) return;
-    if (!currentValue.includes(dot)) {
-        currentValue += dot;
-    }
-    updateScreen();
-}
-
-function resetCalculator() {
-    currentValue = '0';
-    firstValue = null;
-    operator = null;
-    waitingForSecondValue = false;
-    updateScreen();
-}
-
-buttons.addEventListener('click', (event) => {
-    const { target } = event;
-    if (!target.matches('button')) {
-        return;
-    }
-
-    const value = target.value;
-
-    switch (value) {
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-            handleOperator(value);
-            break;
-        case '.':
-            handleDecimal(value);
-            break;
-        case 'all-clear':
+        if (target.classList.contains('clear')) {
             resetCalculator();
-            break;
-        case '=':
-            if (firstValue === null || operator === null) {
-                return;
-            }
-            const secondValue = parseFloat(currentValue);
-            const result = operate(firstValue, secondValue, operator);
-            currentValue = String(result);
-            firstValue = null;
-            operator = null;
-            waitingForSecondValue = true;
-            updateScreen();
-            break;
-        default:
-            handleNumber(value);
+            updateDisplay();
+            return;
+        }
+
+        if (target.classList.contains('equal')) {
+            calculate();
+            updateDisplay();
+            return;
+        }
+    });
+
+    function inputDigit(digit) {
+        if (waitingForSecondOperand === true) {
+            currentInput = digit;
+            waitingForSecondOperand = false;
+        } else {
+            currentInput = currentInput === '0' ? digit : currentInput + digit;
+        }
+    }
+
+    function inputDecimal(dot) {
+        if (waitingForSecondOperand === true) {
+            currentInput = '0.';
+            waitingForSecondOperand = false;
+            return;
+        }
+
+        if (!currentInput.includes(dot)) {
+            currentInput += dot;
+        }
+    }
+
+    function handleOperator(nextOperator) {
+        const inputValue = parseFloat(currentInput);
+
+        if (operator && waitingForSecondOperand) {
+            operator = nextOperator;
+            return;
+        }
+
+        if (firstOperand === null) {
+            firstOperand = inputValue;
+        } else if (operator) {
+            const result = performCalculation[operator](firstOperand, inputValue);
+            currentInput = String(result);
+            firstOperand = result;
+        }
+
+        waitingForSecondOperand = true;
+        operator = nextOperator;
+    }
+
+    const performCalculation = {
+        '/': (firstOperand, secondOperand) => firstOperand / secondOperand,
+        '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+        '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+        '-': (firstOperand, secondOperand) => firstOperand - secondOperand
+    };
+
+    function calculate() {
+        if (operator === null || waitingForSecondOperand) {
+            return;
+        }
+
+        const inputValue = parseFloat(currentInput);
+        const result = performCalculation[operator](firstOperand, inputValue);
+        currentInput = String(result);
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
+    }
+
+    function resetCalculator() {
+        currentInput = '0';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
     }
 });
-
-updateScreen();
