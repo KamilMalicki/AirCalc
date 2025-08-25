@@ -79,13 +79,12 @@ buttons.addEventListener('click', (e) => {
     updateDisplay();
 });
 
-// Rejestracja Service Worker
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('Service Worker registered! 😎', reg);
-        }).catch(err => {
-            console.log('Service Worker registration failed: 😥', err);
-        });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('Service Worker registered! 😎', reg);
+    }).catch(err => {
+      console.log('Service Worker registration failed: 😥', err);
     });
+  });
 }
