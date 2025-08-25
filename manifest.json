@@ -1,6 +1,6 @@
 {
-    "name": "Prosty Kalkulator PWA",
-    "short_name": "Kalkulator",
+    "name": "AirCalc",
+    "short_name": "AirCalc",
     "description": "Prosta aplikacja kalkulatora działająca offline.",
     "start_url": "/AirCalc/index.html",
     "display": "standalone",
@@ -10,7 +10,7 @@
         {
             "src": "/AirCalc/images/image-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
             "purpose": "any maskable"
         }
     ]
