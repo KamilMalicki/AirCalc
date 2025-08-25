@@ -1,0 +1,75 @@
+body {
+    background-color: #282c34; /* Ciemny motyw jak w IDE */
+    color: #abb2bf;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.calculator {
+    width: 320px;
+    background-color: #1e2125;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid #3a3f47;
+}
+
+.display {
+    background-color: #171a1d;
+    color: #61afef; /* Kolor jak w składni IDE */
+    font-size: 2.5em;
+    padding: 15px;
+    text-align: right;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.btn {
+    padding: 20px;
+    font-size: 1.5em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    outline: none;
+}
+
+.btn:hover {
+    background-color: #3a3f47;
+}
+
+.btn-number, .btn-decimal {
+    background-color: #2d3138;
+    color: #abb2bf;
+}
+
+.btn-operator {
+    background-color: #56b6c2; /* Akcent kolorystyczny */
+    color: white;
+}
+
+.btn-clear, .btn-backspace {
+    background-color: #e06c75; /* Czerwony kolor dla "reset" */
+    color: white;
+}
+
+.btn-equals {
+    background-color: #98c379; /* Zielony kolor dla "równa się" */
+    color: white;
+}
+
+.zero {
+    grid-column: span 2;
+}
