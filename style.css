@@ -92,6 +92,9 @@ body {
 .btn-equal {
     background-color: var(--equal-bg);
     color: var(--operator-text);
+    grid-column: span 2;
+    border-radius: 30px;
+    width: auto;
 }
 
 .btn:active {
@@ -114,13 +117,4 @@ body {
 
 .btn-equal:active {
     background-color: var(--equal-active-bg);
-}
-
-/* Pozycjonowanie i rozmiar specyficznych przycisków */
-.zero {
-    grid-column: span 2;
-    border-radius: 30px;
-    width: auto;
-    justify-content: flex-start;
-    padding-left: 25px;
 }
