@@ -5,11 +5,13 @@
     --text-color: #333;
     --btn-bg: #f0f0f0;
     --btn-active-bg: #e0e0e0;
-    --operator-bg: #f59e0b;
+
+    --operator-bg: #3b82f6;
     --operator-text: #fff;
-    --operator-active-bg: #d97706;
-    --equal-bg: #f59e0b;
-    --equal-active-bg: #d97706;
+    --operator-active-bg: #2563eb;
+    --equal-bg: #3b82f6; 
+    --equal-active-bg: #2563eb; 
+    
     --clear-bg: #d3d3d3;
     --clear-active-bg: #b0b0b0;
     --border-radius: 20px;
