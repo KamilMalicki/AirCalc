@@ -12,9 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buttons.addEventListener('click', (event) => {
         const { target } = event;
-        if (!target.matches('button')) {
-            return;
-        }
+        if (!target.matches('button')) return;
 
         if (target.classList.contains('number')) {
             inputDigit(target.textContent);
@@ -48,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function inputDigit(digit) {
-        if (waitingForSecondOperand === true) {
+        if (waitingForSecondOperand) {
             currentInput = digit;
             waitingForSecondOperand = false;
         } else {
@@ -57,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function inputDecimal(dot) {
-        if (waitingForSecondOperand === true) {
+        if (waitingForSecondOperand) {
             currentInput = '0.';
             waitingForSecondOperand = false;
             return;
@@ -79,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (firstOperand === null) {
             firstOperand = inputValue;
         } else if (operator) {
-            const result = performCalculation[operator](firstOperand, inputValue);
+            const result = performCalculationoperator;
             currentInput = String(result);
             firstOperand = result;
         }
@@ -89,19 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const performCalculation = {
-        '/': (firstOperand, secondOperand) => firstOperand / secondOperand,
-        '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
-        '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
-        '-': (firstOperand, secondOperand) => firstOperand - secondOperand
+        '/': (a, b) => a / b,
+        '*': (a, b) => a * b,
+        '+': (a, b) => a + b,
+        '-': (a, b) => a - b
     };
 
     function calculate() {
-        if (operator === null || waitingForSecondOperand) {
-            return;
-        }
+        if (operator === null || waitingForSecondOperand) return;
 
         const inputValue = parseFloat(currentInput);
-        const result = performCalculation[operator](firstOperand, inputValue);
+        const result = performCalculationoperator;
         currentInput = String(result);
         firstOperand = null;
         operator = null;
@@ -114,4 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         operator = null;
         waitingForSecondOperand = false;
     }
+
+    updateDisplay();
 });
