@@ -1,90 +1,102 @@
-const display = document.getElementById('display');
-const buttons = document.querySelector('.buttons');
-let currentInput = '';
+const calculator = document.querySelector('.calculator');
+const calculatorScreen = calculator.querySelector('.calculator-screen');
+const buttons = calculator.querySelector('.calculator-buttons');
+
+let previousValue = '';
 let operator = null;
-let firstOperand = null;
-let shouldResetDisplay = false;
+let currentValue = '0';
+let waitingForSecondValue = false;
 
-function operate(op, a, b) {
-    a = parseFloat(a);
-    b = parseFloat(b);
-    if (op === '+') return a + b;
-    if (op === '-') return a - b;
-    if (op === '*') return a * b;
-    if (op === '/') return a / b;
-    return b;
-}
+const updateScreen = () => {
+    calculatorScreen.value = currentValue;
+};
 
-function updateDisplay() {
-    display.innerText = currentInput || '0';
-}
+const handleButtonClick = (event) => {
+    const { value } = event.target;
+    if (event.target.tagName !== 'BUTTON') {
+        return;
+    }
 
-function handleNumber(number) {
-    if (shouldResetDisplay) {
-        currentInput = number;
-        shouldResetDisplay = false;
+    if (event.target.classList.contains('operator')) {
+        handleOperator(value);
+        updateScreen();
+        return;
+    }
+
+    if (event.target.classList.contains('decimal')) {
+        handleDecimal(value);
+        updateScreen();
+        return;
+    }
+
+    if (event.target.classList.contains('all-clear')) {
+        handleAllClear();
+        updateScreen();
+        return;
+    }
+
+    handleNumber(value);
+    updateScreen();
+};
+
+const handleNumber = (number) => {
+    if (waitingForSecondValue) {
+        currentValue = number;
+        waitingForSecondValue = false;
     } else {
-        currentInput += number;
+        currentValue = currentValue === '0' ? number : currentValue + number;
     }
-}
+};
 
-function handleOperator(op) {
-    if (firstOperand === null) {
-        firstOperand = currentInput;
+const handleDecimal = (dot) => {
+    if (waitingForSecondValue) return;
+
+    if (!currentValue.includes(dot)) {
+        currentValue += dot;
+    }
+};
+
+const handleOperator = (nextOperator) => {
+    const inputValue = parseFloat(currentValue);
+
+    if (operator && waitingForSecondValue) {
+        operator = nextOperator;
+        return;
+    }
+
+    if (previousValue === '') {
+        previousValue = inputValue;
     } else if (operator) {
-        firstOperand = operate(operator, firstOperand, currentInput);
-        updateDisplay();
+        const result = calculate(previousValue, inputValue, operator);
+        currentValue = `${parseFloat(result.toFixed(7))}`;
+        previousValue = result;
     }
-    operator = op;
-    shouldResetDisplay = true;
-}
+    
+    waitingForSecondValue = true;
+    operator = nextOperator;
+};
 
-function handleEquals() {
-    if (operator === null || shouldResetDisplay) return;
-    const result = operate(operator, firstOperand, currentInput);
-    currentInput = result.toString();
-    firstOperand = null;
+const calculate = (firstValue, secondValue, operator) => {
+    if (operator === '+') {
+        return firstValue + secondValue;
+    }
+    if (operator === '-') {
+        return firstValue - secondValue;
+    }
+    if (operator === '*') {
+        return firstValue * secondValue;
+    }
+    if (operator === '/') {
+        return firstValue / secondValue;
+    }
+    return secondValue;
+};
+
+const handleAllClear = () => {
+    previousValue = '';
     operator = null;
-    shouldResetDisplay = true;
-    updateDisplay();
-}
+    currentValue = '0';
+    waitingForSecondValue = false;
+};
 
-buttons.addEventListener('click', (e) => {
-    const target = e.target;
-    if (!target.classList.contains('btn')) return;
-
-    if (target.classList.contains('btn-number')) {
-        handleNumber(target.innerText);
-    } else if (target.classList.contains('btn-decimal')) {
-        if (!currentInput.includes('.')) {
-            currentInput += '.';
-        }
-    } else if (target.classList.contains('btn-operator')) {
-        const op = target.dataset.op;
-        if (op === 'backspace') {
-            currentInput = currentInput.slice(0, -1) || '0';
-            shouldResetDisplay = false;
-        } else {
-            handleOperator(op);
-        }
-    } else if (target.classList.contains('btn-equals')) {
-        handleEquals();
-    } else if (target.classList.contains('btn-clear')) {
-        currentInput = '';
-        firstOperand = null;
-        operator = null;
-        shouldResetDisplay = false;
-    }
-
-    updateDisplay();
-});
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      console.log('Service Worker registered! 😎', reg);
-    }).catch(err => {
-      console.log('Service Worker registration failed: 😥', err);
-    });
-  });
-}
+buttons.addEventListener('click', handleButtonClick);
