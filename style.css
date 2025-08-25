@@ -54,12 +54,6 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    grid-template-areas:
-        "expand clear negate percent"
-        "divide n7 n8 n9"
-        "empty1 n4 n5 n6"
-        "empty2 n1 n2 n3"
-        "zero zero decimal empty3";
 }
 
 .btn {
@@ -80,13 +74,12 @@ body {
 }
 
 .btn-number,
-.btn-decimal,
-.btn-expand {
+.btn-decimal {
     background-color: var(--btn-bg);
     color: var(--text-color);
 }
 
-.btn-operator, .btn-equal {
+.btn-operator {
     background-color: var(--operator-bg);
     color: var(--operator-text);
 }
@@ -96,14 +89,18 @@ body {
     color: var(--text-color);
 }
 
+.btn-equal {
+    background-color: var(--equal-bg);
+    color: var(--operator-text);
+}
+
 .btn:active {
     transform: scale(0.95);
     box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-number:active,
-.btn-decimal:active,
-.btn-expand:active {
+.btn-decimal:active {
     background-color: var(--btn-active-bg);
 }
 
@@ -119,59 +116,11 @@ body {
     background-color: var(--equal-active-bg);
 }
 
+/* Pozycjonowanie i rozmiar specyficznych przycisków */
 .zero {
     grid-column: span 2;
     border-radius: 30px;
     width: auto;
     justify-content: flex-start;
     padding-left: 25px;
-}
-
-/* Pozycjonowanie przycisków za pomocą grid-area */
-.btn-expand { grid-area: expand; }
-.btn-clear { grid-area: clear; }
-.btn-operator[data-action="negate"] { grid-area: negate; }
-.btn-operator[data-action="percent"] { grid-area: percent; }
-.btn-operator[data-action="divide"] { grid-area: divide; }
-.btn-number:nth-of-type(1) { grid-area: n7; }
-.btn-number:nth-of-type(2) { grid-area: n8; }
-.btn-number:nth-of-type(3) { grid-area: n9; }
-.btn-number:nth-of-type(4) { grid-area: n4; }
-.btn-number:nth-of-type(5) { grid-area: n5; }
-.btn-number:nth-of-type(6) { grid-area: n6; }
-.btn-number:nth-of-type(7) { grid-area: n1; }
-.btn-number:nth-of-type(8) { grid-area: n2; }
-.btn-number:nth-of-type(9) { grid-area: n3; }
-.zero { grid-area: zero; }
-.btn-decimal { grid-area: decimal; }
-
-/* Nowe elementy do wypełniania pustych miejsc */
-.buttons::after {
-    content: '';
-    grid-area: empty1;
-}
-.buttons::before {
-    content: '';
-    grid-area: empty2;
-}
-
-/* Dostosowanie układu, aby przyciski x, -, +, = były w oddzielnym rzędzie */
-.btn-operator[data-action="multiply"] {
-    grid-column: 4;
-    grid-row: 2;
-}
-
-.btn-operator[data-action="subtract"] {
-    grid-column: 4;
-    grid-row: 3;
-}
-
-.btn-operator[data-action="add"] {
-    grid-column: 4;
-    grid-row: 4;
-}
-
-.btn-equal {
-    grid-column: 4;
-    grid-row: 5;
 }
