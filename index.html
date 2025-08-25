@@ -4,40 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirCalc</title>
-    <link rel="stylesheet" href="/AirCalc/style.css">
-    <link rel="manifest" href="/AirCalc/manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
     <div class="calculator">
         <div class="display">0</div>
         <div class="buttons">
-            <button class="clear">C</button>
-            <button class="operator">/</button>
-            <button class="operator">*</button>
-            <button class="operator">-</button>
-            <button class="number">7</button>
-            <button class="number">8</button>
-            <button class="number">9</button>
-            <button class="operator">+</button>
-            <button class="number">4</button>
-            <button class="number">5</button>
-            <button class="number">6</button>
-            <button class="equal">=</button>
-            <button class="number">1</button>
-            <button class="number">2</button>
-            <button class="number">3</button>
-            <button class="number">0</button>
-            <button class="decimal">.</button>
+            <button class="btn btn-clear">AC</button>
+            <button class="btn btn-operator" data-action="negate">+/-</button>
+            <button class="btn btn-operator" data-action="percent">%</button>
+            <button class="btn btn-operator" data-action="divide">÷</button>
+            <button class="btn btn-number">7</button>
+            <button class="btn btn-number">8</button>
+            <button class="btn btn-number">9</button>
+            <button class="btn btn-operator" data-action="multiply">×</button>
+            <button class="btn btn-number">4</button>
+            <button class="btn btn-number">5</button>
+            <button class="btn btn-number">6</button>
+            <button class="btn btn-operator" data-action="subtract">-</button>
+            <button class="btn btn-number">1</button>
+            <button class="btn btn-number">2</button>
+            <button class="btn btn-number">3</button>
+            <button class="btn btn-operator" data-action="add">+</button>
+            <button class="btn btn-number zero">0</button>
+            <button class="btn btn-decimal">.</button>
+            <button class="btn btn-equal" data-action="calculate">=</button>
         </div>
     </div>
 
-    <script src="/AirCalc/script.js"></script>
+    <script src="script.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/AirCalc/sw.js')
-                    .then(reg => console.log('Service Worker zarejestrowany!', reg))
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker zarejestrowany!'))
                     .catch(err => console.log('Błąd rejestracji Service Workera:', err));
             });
         }

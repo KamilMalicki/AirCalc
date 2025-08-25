@@ -1,115 +1,111 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const display = document.querySelector('.display');
-    const buttons = document.querySelector('.buttons');
-    let currentInput = '0';
-    let firstOperand = null;
-    let operator = null;
-    let waitingForSecondOperand = false;
+const display = document.querySelector('.display');
+const buttons = document.querySelector('.buttons');
 
-    function updateDisplay() {
-        display.textContent = currentInput;
+let firstValue = '';
+let operator = '';
+let secondValue = '';
+let shouldResetDisplay = false;
+
+function operate(operator, a, b) {
+    a = parseFloat(a);
+    b = parseFloat(b);
+    switch (operator) {
+        case '+':
+            return a + b;
+        case '-':
+            return a - b;
+        case '×':
+            return a * b;
+        case '÷':
+            return b === 0 ? 'Error' : a / b;
+        case '%':
+            return a / 100;
+        default:
+            return null;
+    }
+}
+
+function updateDisplay(value) {
+    display.textContent = value.toString().substring(0, 10); // Limit do 10 znaków
+}
+
+buttons.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target.matches('button')) {
+        return;
     }
 
-    buttons.addEventListener('click', (event) => {
-        const { target } = event;
-        if (!target.matches('button')) return;
+    const value = target.textContent;
+    const action = target.dataset.action;
 
-        if (target.classList.contains('number')) {
-            inputDigit(target.textContent);
-            updateDisplay();
-            return;
-        }
-
-        if (target.classList.contains('decimal')) {
-            inputDecimal(target.textContent);
-            updateDisplay();
-            return;
-        }
-
-        if (target.classList.contains('operator')) {
-            handleOperator(target.textContent);
-            updateDisplay();
-            return;
-        }
-
-        if (target.classList.contains('clear')) {
-            resetCalculator();
-            updateDisplay();
-            return;
-        }
-
-        if (target.classList.contains('equal')) {
-            calculate();
-            updateDisplay();
-            return;
-        }
-    });
-
-    function inputDigit(digit) {
-        if (waitingForSecondOperand) {
-            currentInput = digit;
-            waitingForSecondOperand = false;
+    if (!action) {
+        if (shouldResetDisplay) {
+            display.textContent = value;
+            shouldResetDisplay = false;
         } else {
-            currentInput = currentInput === '0' ? digit : currentInput + digit;
+            display.textContent = display.textContent === '0' ? value : display.textContent + value;
         }
     }
 
-    function inputDecimal(dot) {
-        if (waitingForSecondOperand) {
-            currentInput = '0.';
-            waitingForSecondOperand = false;
-            return;
-        }
+    if (action === 'clear') {
+        display.textContent = '0';
+        firstValue = '';
+        operator = '';
+        secondValue = '';
+        shouldResetDisplay = false;
+    }
 
-        if (!currentInput.includes(dot)) {
-            currentInput += dot;
+    if (action === 'decimal') {
+        if (shouldResetDisplay) {
+            display.textContent = '0.';
+            shouldResetDisplay = false;
+        } else if (!display.textContent.includes('.')) {
+            display.textContent += '.';
+        }
+    }
+    
+    if (action === 'negate') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            currentValue = currentValue * -1;
+            updateDisplay(currentValue);
         }
     }
 
-    function handleOperator(nextOperator) {
-        const inputValue = parseFloat(currentInput);
-
-        if (operator && waitingForSecondOperand) {
-            operator = nextOperator;
-            return;
+    if (action === 'percent') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            let result = operate('%', currentValue);
+            updateDisplay(result);
         }
+    }
 
-        if (firstOperand === null) {
-            firstOperand = inputValue;
-        } else if (operator) {
-            const result = performCalculationoperator;
-            currentInput = String(result);
-            firstOperand = result;
+    if (
+        action === 'add' ||
+        action === 'subtract' ||
+        action === 'multiply' ||
+        action === 'divide'
+    ) {
+        if (firstValue && operator && !shouldResetDisplay) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = result;
+        } else {
+            firstValue = display.textContent;
         }
-
-        waitingForSecondOperand = true;
-        operator = nextOperator;
+        operator = value;
+        shouldResetDisplay = true;
     }
 
-    const performCalculation = {
-        '/': (a, b) => a / b,
-        '*': (a, b) => a * b,
-        '+': (a, b) => a + b,
-        '-': (a, b) => a - b
-    };
-
-    function calculate() {
-        if (operator === null || waitingForSecondOperand) return;
-
-        const inputValue = parseFloat(currentInput);
-        const result = performCalculationoperator;
-        currentInput = String(result);
-        firstOperand = null;
-        operator = null;
-        waitingForSecondOperand = false;
+    if (action === 'calculate') {
+        if (firstValue && operator) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = '';
+            operator = '';
+            shouldResetDisplay = true;
+        }
     }
-
-    function resetCalculator() {
-        currentInput = '0';
-        firstOperand = null;
-        operator = null;
-        waitingForSecondOperand = false;
-    }
-
-    updateDisplay();
 });

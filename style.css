@@ -1,9 +1,25 @@
-/* Import nowoczesnej czcionki */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+:root {
+    --bg-color: #f0f0f0;
+    --calculator-bg: #fff;
+    --display-bg: #f5f5f5;
+    --text-color: #333;
+    --btn-bg: #f0f0f0;
+    --btn-active-bg: #e0e0e0;
+    --operator-bg: #f59e0b;
+    --operator-text: #fff;
+    --operator-active-bg: #d97706;
+    --equal-bg: #f59e0b;
+    --equal-active-bg: #d97706;
+    --clear-bg: #d3d3d3;
+    --clear-active-bg: #b0b0b0;
+    --border-radius: 20px;
+    --btn-border-radius: 50px;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(to right, #e3f2fd, #bbdefb);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,25 +28,25 @@ body {
 }
 
 .calculator {
-    background-color: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(33, 150, 243, 0.2);
-    padding: 20px;
     width: 320px;
-    max-width: 90%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    background: var(--calculator-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
 }
 
 .display {
+    background: var(--display-bg);
+    border-radius: 15px;
+    color: var(--text-color);
     font-size: 2.5em;
-    background-color: #e3f2fd;
-    padding: 15px;
-    border-radius: 12px;
+    font-weight: 300;
+    padding: 20px;
     text-align: right;
-    color: #0d47a1;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .buttons {
@@ -39,52 +55,59 @@ body {
     gap: 12px;
 }
 
-button {
-    padding: 18px;
-    font-size: 1.2em;
+.btn {
+    font-size: 1.5em;
+    font-weight: 400;
     border: none;
-    border-radius: 12px;
-    background-color: #2196f3;
-    color: white;
-    font-weight: 600;
+    padding: 20px 0;
+    border-radius: var(--btn-border-radius);
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent; /* Disable the tap highlight on mobile */
 }
 
-button:hover {
-    background-color: #1976d2;
-    transform: scale(1.05);
+.btn-number,
+.btn-decimal {
+    background-color: var(--btn-bg);
+    color: var(--text-color);
 }
 
-button:active {
+.btn-operator {
+    background-color: var(--operator-bg);
+    color: var(--operator-text);
+}
+
+.btn-clear {
+    background-color: var(--clear-bg);
+    color: var(--text-color);
+}
+
+.btn-equal {
+    background-color: var(--equal-bg);
+    color: var(--operator-text);
+}
+
+.btn:active {
     transform: scale(0.95);
 }
 
-button.operator {
-    background-color: #64b5f6;
+.btn-number:active,
+.btn-decimal:active {
+    background-color: var(--btn-active-bg);
 }
 
-button.operator:hover {
-    background-color: #42a5f5;
+.btn-operator:active {
+    background-color: var(--operator-active-bg);
 }
 
-button.clear {
-    background-color: #ef5350;
+.btn-clear:active {
+    background-color: var(--clear-active-bg);
 }
 
-button.clear:hover {
-    background-color: #e53935;
+.btn-equal:active {
+    background-color: var(--equal-active-bg);
 }
 
-button.equal {
-    background-color: #43a047;
-}
-
-button.equal:hover {
-    background-color: #388e3c;
-}
-
-button.decimal {
-    background-color: #90caf9;
-    color: #0d47a1;
+.zero {
+    grid-column: span 2;
 }
