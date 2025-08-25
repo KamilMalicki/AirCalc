@@ -1,6 +1,9 @@
+/* Import nowoczesnej czcionki */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 body {
-    background-color: #f0f0f0;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to right, #e3f2fd, #bbdefb);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,56 +12,79 @@ body {
 }
 
 .calculator {
-    background-color: #333;
-    border-radius: 10px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(33, 150, 243, 0.2);
     padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    display: grid;
-    grid-template-rows: auto 1fr;
-    width: 300px;
+    width: 320px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .display {
-    background-color: #222;
-    color: #fff;
     font-size: 2.5em;
-    text-align: right;
+    background-color: #e3f2fd;
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    overflow: hidden;
+    border-radius: 12px;
+    text-align: right;
+    color: #0d47a1;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
 }
 
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 12px;
 }
 
 button {
-    background-color: #555;
-    color: #fff;
+    padding: 18px;
+    font-size: 1.2em;
     border: none;
-    border-radius: 5px;
-    font-size: 1.5em;
-    padding: 20px;
+    border-radius: 12px;
+    background-color: #2196f3;
+    color: white;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 button:hover {
-    background-color: #777;
+    background-color: #1976d2;
+    transform: scale(1.05);
 }
 
-.operator {
-    background-color: #ff9500;
+button:active {
+    transform: scale(0.95);
 }
 
-.equal {
-    grid-column: span 2;
-    background-color: #007aff;
+button.operator {
+    background-color: #64b5f6;
 }
 
-.clear {
-    grid-column: span 2;
+button.operator:hover {
+    background-color: #42a5f5;
+}
+
+button.clear {
+    background-color: #ef5350;
+}
+
+button.clear:hover {
+    background-color: #e53935;
+}
+
+button.equal {
+    background-color: #43a047;
+}
+
+button.equal:hover {
+    background-color: #388e3c;
+}
+
+button.decimal {
+    background-color: #90caf9;
+    color: #0d47a1;
 }
