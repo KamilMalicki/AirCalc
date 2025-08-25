@@ -1,20 +1,20 @@
 :root {
-    --bg-color: #f0f0f0;
-    --calculator-bg: #fff;
-    --display-bg: #f5f5f5;
+    --bg-color: #e6e6e6;
+    --calculator-bg: #f7f7f7;
+    --display-bg: #ffffff;
     --text-color: #333;
-    --btn-bg: #f0f0f0;
-    --btn-active-bg: #e0e0e0;
-    --operator-bg: #3b82f6; 
+    --btn-bg: #ffffff;
+    --btn-active-bg: #e6e6e6;
+    --operator-bg: #3b82f6;
     --operator-text: #fff;
-    --operator-active-bg: #2563eb; 
-    --equal-bg: #3b82f6; 
-    --equal-active-bg: #2563eb; 
-    --clear-bg: #d3d3d3;
-    --clear-active-bg: #b0b0b0;
-    --border-radius: 20px;
-    --btn-border-radius: 50px;
-    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --operator-active-bg: #2563eb;
+    --equal-bg: #3b82f6;
+    --equal-active-bg: #2563eb;
+    --clear-bg: #c1c1c1;
+    --clear-active-bg: #a6a6a6;
+    --border-radius: 30px;
+    --btn-border-radius: 50%;
+    --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -31,7 +31,7 @@ body {
     width: 320px;
     background: var(--calculator-bg);
     border-radius: var(--border-radius);
-    padding: 20px;
+    padding: 25px;
     box-shadow: var(--shadow);
 }
 
@@ -39,7 +39,7 @@ body {
     background: var(--display-bg);
     border-radius: 15px;
     color: var(--text-color);
-    font-size: 2.5em;
+    font-size: 3.5em;
     font-weight: 300;
     padding: 20px;
     text-align: right;
@@ -47,6 +47,7 @@ body {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .buttons {
@@ -55,11 +56,10 @@ body {
     gap: 12px;
     grid-template-areas:
         "expand clear negate percent"
-        "divide multiply subtract add"
-        "n7 n8 n9 . "
-        "n4 n5 n6 . "
-        "n1 n2 n3 . "
-        "zero zero decimal equal";
+        "divide n7 n8 n9"
+        "empty1 n4 n5 n6"
+        "empty2 n1 n2 n3"
+        "zero zero decimal empty3";
 }
 
 .btn {
@@ -71,15 +71,22 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
     -webkit-tap-highlight-color: transparent;
+    height: 60px;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-number,
-.btn-decimal {
+.btn-decimal,
+.btn-expand {
     background-color: var(--btn-bg);
     color: var(--text-color);
 }
 
-.btn-operator {
+.btn-operator, .btn-equal {
     background-color: var(--operator-bg);
     color: var(--operator-text);
 }
@@ -89,17 +96,14 @@ body {
     color: var(--text-color);
 }
 
-.btn-equal {
-    background-color: var(--equal-bg);
-    color: var(--operator-text);
-}
-
 .btn:active {
     transform: scale(0.95);
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-number:active,
-.btn-decimal:active {
+.btn-decimal:active,
+.btn-expand:active {
     background-color: var(--btn-active-bg);
 }
 
@@ -115,15 +119,20 @@ body {
     background-color: var(--equal-active-bg);
 }
 
+.zero {
+    grid-column: span 2;
+    border-radius: 30px;
+    width: auto;
+    justify-content: flex-start;
+    padding-left: 25px;
+}
+
 /* Pozycjonowanie przycisków za pomocą grid-area */
 .btn-expand { grid-area: expand; }
 .btn-clear { grid-area: clear; }
 .btn-operator[data-action="negate"] { grid-area: negate; }
 .btn-operator[data-action="percent"] { grid-area: percent; }
 .btn-operator[data-action="divide"] { grid-area: divide; }
-.btn-operator[data-action="multiply"] { grid-area: multiply; }
-.btn-operator[data-action="subtract"] { grid-area: subtract; }
-.btn-operator[data-action="add"] { grid-area: add; }
 .btn-number:nth-of-type(1) { grid-area: n7; }
 .btn-number:nth-of-type(2) { grid-area: n8; }
 .btn-number:nth-of-type(3) { grid-area: n9; }
@@ -135,33 +144,34 @@ body {
 .btn-number:nth-of-type(9) { grid-area: n3; }
 .zero { grid-area: zero; }
 .btn-decimal { grid-area: decimal; }
-.btn-equal { grid-area: equal; }
 
-
-.additional-options {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    overflow: hidden;
-    max-height: 0;
-    padding: 0;
-    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+/* Nowe elementy do wypełniania pustych miejsc */
+.buttons::after {
+    content: '';
+    grid-area: empty1;
+}
+.buttons::before {
+    content: '';
+    grid-area: empty2;
 }
 
-.additional-options.visible {
-    max-height: 200px;
-    padding-bottom: 12px;
+/* Dostosowanie układu, aby przyciski x, -, +, = były w oddzielnym rzędzie */
+.btn-operator[data-action="multiply"] {
+    grid-column: 4;
+    grid-row: 2;
 }
 
-.btn-expand {
-    background-color: #d3d3d3;
-    color: var(--text-color);
-    font-size: 1.5em;
-    font-weight: bold;
+.btn-operator[data-action="subtract"] {
+    grid-column: 4;
+    grid-row: 3;
 }
 
-.btn-sci, .btn-prog {
-    background-color: var(--btn-bg);
-    color: var(--text-color);
+.btn-operator[data-action="add"] {
+    grid-column: 4;
+    grid-row: 4;
+}
+
+.btn-equal {
+    grid-column: 4;
+    grid-row: 5;
 }
