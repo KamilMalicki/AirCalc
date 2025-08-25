@@ -5,8 +5,8 @@ const urlsToCache = [
   '/style.css',
   '/script.js',
   '/manifest.json',
-  '/image-192.png',
-  '/image-512.png'
+  '/aircalc/image-192.png',
+  '/aircalc/image-512.png'
 ];
 
 self.addEventListener('install', event => {
