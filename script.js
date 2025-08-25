@@ -1,10 +1,29 @@
 const display = document.querySelector('.display');
 const buttons = document.querySelector('.buttons');
+const additionalOptions = document.querySelector('.additional-options');
 
 let firstValue = '';
 let operator = '';
 let secondValue = '';
 let shouldResetDisplay = false;
+
+function convertBase(value, base) {
+    if (value === 'Error') return 'Error';
+    let decimalValue = parseInt(value, 10);
+    
+    switch (base) {
+        case 'bin':
+            return decimalValue.toString(2);
+        case 'oct':
+            return decimalValue.toString(8);
+        case 'dec':
+            return decimalValue.toString(10);
+        case 'hex':
+            return decimalValue.toString(16).toUpperCase();
+        default:
+            return value;
+    }
+}
 
 function operate(operator, a, b) {
     a = parseFloat(a);
@@ -20,13 +39,21 @@ function operate(operator, a, b) {
             return b === 0 ? 'Error' : a / b;
         case '%':
             return a / 100;
+        case 'sin':
+            return Math.sin(a * Math.PI / 180);
+        case 'cos':
+            return Math.cos(a * Math.PI / 180);
+        case 'sqrt':
+            return Math.sqrt(a);
+        case 'power':
+            return Math.pow(a, b);
         default:
             return null;
     }
 }
 
 function updateDisplay(value) {
-    display.textContent = value.toString().substring(0, 10); // Limit do 10 znaków
+    display.textContent = value.toString().substring(0, 10);
 }
 
 buttons.addEventListener('click', (event) => {
@@ -37,6 +64,20 @@ buttons.addEventListener('click', (event) => {
 
     const value = target.textContent;
     const action = target.dataset.action;
+    const base = target.dataset.base;
+
+    if (action === 'toggle-options') {
+        additionalOptions.classList.toggle('visible');
+        return;
+    }
+
+    if (base) {
+        const currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            updateDisplay(convertBase(currentValue, base));
+        }
+        return;
+    }
 
     if (!action) {
         if (shouldResetDisplay) {
@@ -47,6 +88,18 @@ buttons.addEventListener('click', (event) => {
         }
     }
 
+    if (
+        action === 'sin' ||
+        action === 'cos' ||
+        action === 'sqrt' ||
+        action === 'power'
+    ) {
+        const currentValue = display.textContent;
+        const result = operate(action, currentValue);
+        updateDisplay(result);
+        shouldResetDisplay = true;
+    }
+    
     if (action === 'clear') {
         display.textContent = '0';
         firstValue = '';
