@@ -57,6 +57,7 @@ const display = document.querySelector('.display');
 const buttons = document.querySelector('.buttons');
 const sideOps = document.querySelector('.side-ops');
 
+
 let firstValue = '';
 let operator = '';
 let secondValue = '';
