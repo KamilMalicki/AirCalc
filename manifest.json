@@ -1,7 +1,7 @@
 {
     "name": "AirCalc",
     "short_name": "AirCalc",
-    "description": "Prosta aplikacja kalkulatora działająca offline.",
+    "description": "Calculator for chromebooks or web browsers users. By Kamil Malicki.",
     "start_url": "/AirCalc/index.html",
     "display": "standalone",
     "background_color": "#ffffff",
