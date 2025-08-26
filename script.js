@@ -1,16 +1,15 @@
-const historyDisplay = document.querySelector('.history');
-const currentOperationDisplay = document.querySelector('.current-operation');
-const calculatorButtons = document.querySelectorAll('.calculator-container button');
+const display = document.querySelector('.display');
+const buttons = document.querySelector('.buttons');
 
-let currentOperand = '';
-let firstOperand = null;
-let operator = null;
-let waitingForSecondOperand = false;
-let isFunctionMode = false;
-let functionName = '';
+let firstValue = '';
+let operator = '';
+let secondValue = '';
+let shouldResetDisplay = false;
 
-function operate(op, a, b) {
-    switch (op) {
+function operate(operator, a, b) {
+    a = parseFloat(a);
+    b = parseFloat(b);
+    switch (operator) {
         case '+':
             return a + b;
         case '-':
@@ -18,117 +17,95 @@ function operate(op, a, b) {
         case '×':
             return a * b;
         case '÷':
-            if (b === 0) return 'Error';
-            return a / b;
-        case '√':
-            return Math.sqrt(a);
-        case 'xⁿ':
-            return Math.pow(a, b);
-        case 'sin':
-            return Math.sin(a * Math.PI / 180);
-        case 'cos':
-            return Math.cos(a * Math.PI / 180);
-        case 'tan':
-            return Math.tan(a * Math.PI / 180);
-        case 'log':
-            if (b <= 0 || a <= 0) return 'Error';
-            return Math.log(b) / Math.log(a);
+            return b === 0 ? 'Error' : a / b;
+        case '%':
+            return a / 100;
         default:
             return null;
     }
 }
 
-function updateDisplay() {
-    if (isFunctionMode) {
-        historyDisplay.textContent = `${functionName}(${currentOperand})`;
-        currentOperationDisplay.textContent = '';
-    } else {
-        currentOperationDisplay.textContent = currentOperand;
-    }
+function updateDisplay(value) {
+    display.textContent = value.toString().substring(0, 10);
 }
 
-calculatorButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const action = button.dataset.action;
-        const value = button.textContent;
+buttons.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target.matches('button')) {
+        return;
+    }
 
-        if (button.classList.contains('btn-number')) {
-            if (waitingForSecondOperand) {
-                currentOperand = value;
-                waitingForSecondOperand = false;
-            } else {
-                currentOperand = currentOperand === '' ? value : currentOperand + value;
-            }
-            updateDisplay();
-        }
+    const value = target.textContent;
+    const action = target.dataset.action;
 
-        if (action === 'decimal') {
-            if (!currentOperand.includes('.')) {
-                currentOperand += '.';
-                updateDisplay();
-            }
+    if (!action) {
+        if (shouldResetDisplay) {
+            display.textContent = value;
+            shouldResetDisplay = false;
+        } else {
+            display.textContent = display.textContent === '0' ? value : display.textContent + value;
         }
+    }
 
-        if (action === 'clear') {
-            currentOperand = '';
-            firstOperand = null;
-            operator = null;
-            waitingForSecondOperand = false;
-            isFunctionMode = false;
-            functionName = '';
-            historyDisplay.textContent = '';
-            currentOperationDisplay.textContent = '0';
-        }
+    if (action === 'clear') {
+        display.textContent = '0';
+        firstValue = '';
+        operator = '';
+        secondValue = '';
+        shouldResetDisplay = false;
+    }
 
-        if (button.classList.contains('btn-operator') && action !== 'power' && action !== 'sqrt' && action !== 'log' && action !== 'sin' && action !== 'cos' && action !== 'tan') {
-            if (firstOperand !== null && operator !== null && !waitingForSecondOperand) {
-                const result = operate(operator, firstOperand, parseFloat(currentOperand));
-                currentOperand = result;
-                firstOperand = result;
-            } else {
-                firstOperand = parseFloat(currentOperand);
-            }
-            operator = value;
-            waitingForSecondOperand = true;
-            historyDisplay.textContent = `${firstOperand} ${operator}`;
-            updateDisplay();
+    if (action === 'decimal') {
+        if (shouldResetDisplay) {
+            display.textContent = '0.';
+            shouldResetDisplay = false;
+        } else if (!display.textContent.includes('.')) {
+            display.textContent += '.';
         }
+    }
+    
+    if (action === 'negate') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            currentValue = currentValue * -1;
+            updateDisplay(currentValue);
+        }
+    }
 
-        if (action === 'calculate') {
-            if (firstOperand !== null && operator !== null) {
-                const secondOperand = parseFloat(currentOperand);
-                const result = operate(operator, firstOperand, secondOperand);
-                currentOperand = result;
-                firstOperand = null;
-                operator = null;
-                waitingForSecondOperand = true;
-                historyDisplay.textContent = `${firstOperand} ${operator} ${secondOperand} =`;
-                updateDisplay();
-            }
+    if (action === 'percent') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            let result = operate('%', currentValue);
+            updateDisplay(result);
         }
+    }
 
-        if (action === 'sqrt' || action === 'sin' || action === 'cos' || action === 'tan') {
-            if (currentOperand !== '') {
-                const result = operate(action, parseFloat(currentOperand));
-                currentOperand = result;
-                updateDisplay();
-            }
+    if (
+        action === 'add' ||
+        action === 'subtract' ||
+        action === 'multiply' ||
+        action === 'divide'
+    ) {
+        if (firstValue && operator && !shouldResetDisplay) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = result;
+        } else {
+            firstValue = display.textContent;
         }
+        operator = value;
+        shouldResetDisplay = true;
+    }
 
-        if (action === 'power') {
-            firstOperand = parseFloat(currentOperand);
-            operator = action;
-            waitingForSecondOperand = true;
-            historyDisplay.textContent = `${firstOperand}^`;
-            currentOperand = '';
+    if (action === 'calculate') {
+        if (firstValue && operator) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = '';
+            operator = '';
+            shouldResetDisplay = true;
         }
-
-        if (action === 'log') {
-            firstOperand = parseFloat(currentOperand); // Baza logarytmu
-            operator = action;
-            waitingForSecondOperand = true;
-            historyDisplay.textContent = `log${firstOperand}( )`;
-            currentOperand = '';
-        }
-    });
+    }
 });
