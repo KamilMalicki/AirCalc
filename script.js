@@ -80,44 +80,13 @@ buttons.addEventListener('click', (event) => {
         }
     }
 
-        if (action === 'square') {
-            let currentValue = parseFloat(display.textContent);
-            if (!isNaN(currentValue)) {
-                display.textContent = (currentValue ** 2).toString() + '²';
-                shouldResetDisplay = true;
-            }
-            return;
-        }
-
-        if (action === 'cube') {
-            let currentValue = parseFloat(display.textContent);
-            if (!isNaN(currentValue)) {
-                display.textContent = (currentValue ** 3).toString() + '³';
-                shouldResetDisplay = true;
-            }
-            return;
-        }
-
-        if (action === 'power') {
-            let currentValue = parseFloat(display.textContent);
-            if (!isNaN(currentValue)) {
-                let exponent = prompt('Podaj wykładnik (np. 4 dla x⁴):');
-                exponent = parseFloat(exponent);
-                if (!isNaN(exponent)) {
-                    display.textContent = (currentValue ** exponent).toString() + '⁽' + exponent + '⁾';
-                    shouldResetDisplay = true;
-                }
-            }
-            return;
-        }
-
         if (action === 'sqrt') {
             let currentValue = parseFloat(display.textContent);
             if (!isNaN(currentValue)) {
                 if (currentValue < 0) {
                     display.textContent = 'Error';
                 } else {
-                    display.textContent = Math.sqrt(currentValue).toString() + '√';
+                    display.textContent = Math.sqrt(currentValue).toString();
                 }
                 shouldResetDisplay = true;
             }
