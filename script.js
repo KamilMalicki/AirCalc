@@ -1,5 +1,7 @@
+
 const display = document.querySelector('.display');
 const buttons = document.querySelector('.buttons');
+const sideOps = document.querySelector('.side-ops');
 
 let firstValue = '';
 let operator = '';
@@ -29,12 +31,9 @@ function updateDisplay(value) {
     display.textContent = value.toString().substring(0, 10);
 }
 
-buttons.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!target.matches('button')) {
-        return;
-    }
 
+function handleButtonAction(target) {
+    if (!target.matches('button')) return;
     const value = target.textContent;
     const action = target.dataset.action;
 
@@ -45,6 +44,7 @@ buttons.addEventListener('click', (event) => {
         } else {
             display.textContent = display.textContent === '0' ? value : display.textContent + value;
         }
+        return;
     }
 
     if (action === 'clear') {
@@ -53,6 +53,7 @@ buttons.addEventListener('click', (event) => {
         operator = '';
         secondValue = '';
         shouldResetDisplay = false;
+        return;
     }
 
     if (action === 'decimal') {
@@ -62,14 +63,16 @@ buttons.addEventListener('click', (event) => {
         } else if (!display.textContent.includes('.')) {
             display.textContent += '.';
         }
+        return;
     }
-    
+
     if (action === 'negate') {
         let currentValue = parseFloat(display.textContent);
         if (!isNaN(currentValue)) {
             currentValue = currentValue * -1;
             updateDisplay(currentValue);
         }
+        return;
     }
 
     if (action === 'percent') {
@@ -78,48 +81,59 @@ buttons.addEventListener('click', (event) => {
             let result = operate('%', currentValue);
             updateDisplay(result);
         }
+        return;
     }
 
-        if (action === 'sqrt') {
-            let currentValue = parseFloat(display.textContent);
-            if (!isNaN(currentValue)) {
-                if (currentValue < 0) {
-                    display.textContent = 'Error';
-                } else {
-                    display.textContent = Math.sqrt(currentValue).toString();
-                }
-                shouldResetDisplay = true;
-            }
-            return;
-        }
-
-        if (
-            action === 'add' ||
-            action === 'subtract' ||
-            action === 'multiply' ||
-            action === 'divide'
-        ) {
-            if (firstValue && operator && !shouldResetDisplay) {
-                secondValue = display.textContent;
-                const result = operate(operator, firstValue, secondValue);
-                updateDisplay(result);
-                firstValue = result;
+    if (action === 'sqrt') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            if (currentValue < 0) {
+                display.textContent = 'Error';
             } else {
-                firstValue = display.textContent;
+                display.textContent = Math.sqrt(currentValue).toString();
             }
-            operator = value;
             shouldResetDisplay = true;
         }
+        return;
+    }
 
-        if (action === 'calculate') {
-            if (firstValue && operator) {
-                secondValue = display.textContent;
-                const result = operate(operator, firstValue, secondValue);
-                updateDisplay(result);
-                firstValue = '';
-                operator = '';
-                secondValue = '';
-                shouldResetDisplay = true;
-            }
+    if (
+        action === 'add' ||
+        action === 'subtract' ||
+        action === 'multiply' ||
+        action === 'divide'
+    ) {
+        if (firstValue && operator && !shouldResetDisplay) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = result;
+        } else {
+            firstValue = display.textContent;
         }
+        operator = value;
+        shouldResetDisplay = true;
+        return;
+    }
+
+    if (action === 'calculate') {
+        if (firstValue && operator) {
+            secondValue = display.textContent;
+            const result = operate(operator, firstValue, secondValue);
+            updateDisplay(result);
+            firstValue = '';
+            operator = '';
+            secondValue = '';
+            shouldResetDisplay = true;
+        }
+        return;
+    }
+}
+
+buttons.addEventListener('click', (event) => {
+    handleButtonAction(event.target);
+});
+
+sideOps.addEventListener('click', (event) => {
+    handleButtonAction(event.target);
 });
