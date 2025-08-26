@@ -1,10 +1,13 @@
-const display = document.querySelector('.display');
+const mainDisplay = document.querySelector('.main-display');
+const powerDisplay = document.querySelector('.power-display');
 const buttons = document.querySelector('.buttons');
+const scientificButtons = document.querySelector('.scientific-buttons');
 
 let firstValue = '';
 let operator = '';
 let secondValue = '';
 let shouldResetDisplay = false;
+let isPowerMode = false;
 
 function operate(operator, a, b) {
     a = parseFloat(a);
@@ -20,15 +23,38 @@ function operate(operator, a, b) {
             return b === 0 ? 'Error' : a / b;
         case '%':
             return a / 100;
+        case '√':
+            return Math.sqrt(a);
+        case 'power':
+            return Math.pow(a, b);
+        case 'sin':
+            return Math.sin(a * (Math.PI / 180));
+        case 'cos':
+            return Math.cos(a * (Math.PI / 180));
+        case 'tan':
+            return Math.tan(a * (Math.PI / 180));
+        case 'log':
+            return Math.log10(a);
         default:
             return null;
     }
 }
 
-function updateDisplay(value) {
-    display.textContent = value.toString().substring(0, 10);
+function updateDisplay(value, targetDisplay = mainDisplay) {
+    targetDisplay.textContent = value.toString().substring(0, 10);
 }
 
+function resetCalculator() {
+    mainDisplay.textContent = '0';
+    powerDisplay.textContent = '';
+    firstValue = '';
+    operator = '';
+    secondValue = '';
+    shouldResetDisplay = false;
+    isPowerMode = false;
+}
+
+// Obsługa przycisków standardowego kalkulatora
 buttons.addEventListener('click', (event) => {
     const target = event.target;
     if (!target.matches('button')) {
@@ -38,34 +64,49 @@ buttons.addEventListener('click', (event) => {
     const value = target.textContent;
     const action = target.dataset.action;
 
+    if (action === 'power') {
+        isPowerMode = true;
+        firstValue = mainDisplay.textContent;
+        mainDisplay.textContent = '';
+        return;
+    }
+
     if (!action) {
         if (shouldResetDisplay) {
-            display.textContent = value;
+            mainDisplay.textContent = value;
             shouldResetDisplay = false;
         } else {
-            display.textContent = display.textContent === '0' ? value : display.textContent + value;
+            if (isPowerMode) {
+                powerDisplay.textContent += value;
+            } else {
+                mainDisplay.textContent = mainDisplay.textContent === '0' ? value : mainDisplay.textContent + value;
+            }
         }
     }
 
     if (action === 'clear') {
-        display.textContent = '0';
-        firstValue = '';
-        operator = '';
-        secondValue = '';
-        shouldResetDisplay = false;
+        resetCalculator();
     }
 
     if (action === 'decimal') {
         if (shouldResetDisplay) {
-            display.textContent = '0.';
+            if (isPowerMode) {
+                powerDisplay.textContent = '0.';
+            } else {
+                mainDisplay.textContent = '0.';
+            }
             shouldResetDisplay = false;
-        } else if (!display.textContent.includes('.')) {
-            display.textContent += '.';
+        } else if (!mainDisplay.textContent.includes('.')) {
+            if (isPowerMode && !powerDisplay.textContent.includes('.')) {
+                powerDisplay.textContent += '.';
+            } else if (!isPowerMode) {
+                mainDisplay.textContent += '.';
+            }
         }
     }
     
     if (action === 'negate') {
-        let currentValue = parseFloat(display.textContent);
+        let currentValue = parseFloat(mainDisplay.textContent);
         if (!isNaN(currentValue)) {
             currentValue = currentValue * -1;
             updateDisplay(currentValue);
@@ -73,7 +114,7 @@ buttons.addEventListener('click', (event) => {
     }
 
     if (action === 'percent') {
-        let currentValue = parseFloat(display.textContent);
+        let currentValue = parseFloat(mainDisplay.textContent);
         if (!isNaN(currentValue)) {
             let result = operate('%', currentValue);
             updateDisplay(result);
@@ -87,25 +128,59 @@ buttons.addEventListener('click', (event) => {
         action === 'divide'
     ) {
         if (firstValue && operator && !shouldResetDisplay) {
-            secondValue = display.textContent;
+            secondValue = mainDisplay.textContent;
             const result = operate(operator, firstValue, secondValue);
             updateDisplay(result);
             firstValue = result;
         } else {
-            firstValue = display.textContent;
+            firstValue = mainDisplay.textContent;
         }
         operator = value;
         shouldResetDisplay = true;
     }
 
     if (action === 'calculate') {
-        if (firstValue && operator) {
-            secondValue = display.textContent;
+        if (isPowerMode) {
+            secondValue = powerDisplay.textContent;
+            const result = operate('power', firstValue, secondValue);
+            updateDisplay(result);
+            isPowerMode = false;
+        } else if (firstValue && operator) {
+            secondValue = mainDisplay.textContent;
             const result = operate(operator, firstValue, secondValue);
             updateDisplay(result);
-            firstValue = '';
-            operator = '';
-            shouldResetDisplay = true;
+        }
+        firstValue = '';
+        operator = '';
+        powerDisplay.textContent = '';
+        shouldResetDisplay = true;
+    }
+});
+
+// Obsługa przycisków naukowych
+scientificButtons.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target.matches('button')) {
+        return;
+    }
+
+    const action = target.dataset.action;
+    let currentValue = parseFloat(mainDisplay.textContent);
+
+    if (action === 'sqrt') {
+        if (!isNaN(currentValue) && currentValue >= 0) {
+            let result = operate('√', currentValue);
+            updateDisplay(result);
+        } else {
+            updateDisplay('Error');
+        }
+    }
+    if (action === 'sin' || action === 'cos' || action === 'tan' || action === 'log') {
+        if (!isNaN(currentValue)) {
+            let result = operate(action, currentValue);
+            updateDisplay(result);
+        } else {
+            updateDisplay('Error');
         }
     }
 });
