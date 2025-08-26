@@ -1,3 +1,57 @@
+    if (action === 'sin') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            // Convert degrees to radians
+            let radians = currentValue * Math.PI / 180;
+            display.textContent = Math.sin(radians).toString();
+            shouldResetDisplay = true;
+        }
+        return;
+    }
+
+    if (action === 'cos') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            let radians = currentValue * Math.PI / 180;
+            display.textContent = Math.cos(radians).toString();
+            shouldResetDisplay = true;
+        }
+        return;
+    }
+
+    if (action === 'tan') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            let radians = currentValue * Math.PI / 180;
+            display.textContent = Math.tan(radians).toString();
+            shouldResetDisplay = true;
+        }
+        return;
+    }
+
+    if (action === 'cot') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            let radians = currentValue * Math.PI / 180;
+            let tanValue = Math.tan(radians);
+            if (tanValue === 0) {
+                display.textContent = 'Error';
+            } else {
+                display.textContent = (1 / tanValue).toString();
+            }
+            shouldResetDisplay = true;
+        }
+        return;
+    }
+
+    if (action === 'square') {
+        let currentValue = parseFloat(display.textContent);
+        if (!isNaN(currentValue)) {
+            display.textContent = (currentValue ** 2).toString();
+            shouldResetDisplay = true;
+        }
+        return;
+    }
 
 const display = document.querySelector('.display');
 const buttons = document.querySelector('.buttons');
