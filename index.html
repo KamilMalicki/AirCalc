@@ -10,18 +10,6 @@
 <body>
 
     <div class="calculator-layout">
-        <div class="settings-btn" id="settings-btn">⚙️</div>
-        <div class="settings-panel" id="settings-panel">
-            <h3>Konfiguracja</h3>
-            <label for="calc-bg-color">Kolor tła kalkulatora:</label>
-            <input type="color" id="calc-bg-color" value="#ffffff">
-            <label for="btn-bg-color">Kolor przycisków:</label>
-            <input type="color" id="btn-bg-color" value="#f0f0f0">
-            <label for="op-btn-color">Kolor przycisków operatorów:</label>
-            <input type="color" id="op-btn-color" value="#ff9500">
-            <button id="close-settings-btn">Zamknij</button>
-        </div>
-
         <div class="side-ops">
             <button id="btn-sin" class="btn btn-operator" data-formula="Math.sin(x * Math.PI / 180)">sin</button>
             <button id="btn-cos" class="btn btn-operator" data-formula="Math.cos(x * Math.PI / 180)">cos</button>
@@ -29,6 +17,7 @@
             <button id="btn-cot" class="btn btn-operator" data-formula="1 / Math.tan(x * Math.PI / 180)">ctg</button>
             <button id="btn-square" class="btn btn-operator" data-formula="x ** 2">x²</button>
             <button id="btn-sqrt" class="btn btn-operator" data-formula="x < 0 ? 'Error' : Math.sqrt(x)">√x</button>
+            <button id="btn-settings" class="btn btn-operator">⚙️</button>
         </div>
         <div class="calculator">
             <div class="display">0</div>
