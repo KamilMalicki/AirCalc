@@ -1,4 +1,5 @@
-    if (action === 'sin') {
+
+if (action === 'sin') {
         let currentValue = parseFloat(display.textContent);
         if (!isNaN(currentValue)) {
             // Convert degrees to radians
