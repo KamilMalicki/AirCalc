@@ -28,18 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     };
 
-    // Obsługa przełączania trybu nocnego/dziennego
-    themeToggleButton.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        if (document.body.classList.contains('dark-mode')) {
-            themeToggleButton.textContent = '☀️';
-            showNotification('Tryb nocny włączony.');
-        } else {
-            themeToggleButton.textContent = '🌙';
-            showNotification('Tryb dzienny włączony.');
-        }
-    });
-
     // Obsługuje kliknięcia przycisków numerycznych
     const handleNumber = (number) => {
         if (waitingForSecondOperand) {
