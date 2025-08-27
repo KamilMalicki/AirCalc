@@ -6,10 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let firstOperand = null;
     let operator = null;
     let waitingForSecondOperand = false;
+    let isEnteringExponent = false;
 
     // Aktualizuje wyświetlacz kalkulatora
     const updateDisplay = () => {
-        display.textContent = currentInput;
+        if (isEnteringExponent) {
+            display.innerHTML = `${firstOperand}<sup>${currentInput}</sup>`;
+        } else {
+            display.textContent = currentInput;
+        }
     };
 
     // Obsługuje kliknięcia przycisków numerycznych
@@ -17,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (waitingForSecondOperand) {
             currentInput = number;
             waitingForSecondOperand = false;
+        } else if (isEnteringExponent) {
+            currentInput += number;
         } else {
             currentInput = currentInput === '0' ? number : currentInput + number;
         }
@@ -70,7 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Obsługuje przycisk równości
     const handleEquals = () => {
-        if (operator && !waitingForSecondOperand) {
+        if (isEnteringExponent) {
+            const exponent = parseFloat(currentInput);
+            const result = Math.pow(firstOperand, exponent);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = null;
+            isEnteringExponent = false;
+            updateDisplay();
+        } else if (operator && !waitingForSecondOperand) {
             const secondOperand = parseFloat(currentInput);
             const result = performCalculation[operator](firstOperand, secondOperand);
             currentInput = `${parseFloat(result.toFixed(7))}`;
@@ -87,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstOperand = null;
         operator = null;
         waitingForSecondOperand = false;
+        isEnteringExponent = false;
         updateDisplay();
     };
 
@@ -115,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstOperand = null;
         operator = null;
         waitingForSecondOperand = false;
+        isEnteringExponent = false;
         updateDisplay();
     };
 
@@ -127,8 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleNumber(buttonText);
             } else if (button.id === 'btn-dot') {
                 handleDecimal();
+            } else if (button.id === 'btn-power') {
+                firstOperand = parseFloat(currentInput);
+                currentInput = '';
+                isEnteringExponent = true;
+                updateDisplay();
             } else if (button.classList.contains('btn-operator')) {
-                if (['sin', 'cos', 'tg', 'ctg', 'x²', '√x'].includes(buttonText)) {
+                 if (['sin', 'cos', 'tg', '√x'].includes(buttonText)) {
                     const formula = button.getAttribute('data-formula');
                     if (formula) {
                         handleSideOperation(formula);
