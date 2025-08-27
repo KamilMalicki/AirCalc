@@ -1,166 +1,178 @@
 document.addEventListener('DOMContentLoaded', () => {
     const display = document.querySelector('.display');
     const buttons = document.querySelectorAll('.btn');
-    const powerToggleButton = document.getElementById('btn-power-toggle');
-
+    
     let currentInput = '0';
-    let expression = '';
-    let isExponentMode = false;
-    let base = null;
+    let firstOperand = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
 
-    // Aktualizuje wyświetlacz kalkulatora
-    const updateDisplay = () => {
-        if (isExponentMode) {
-            display.innerHTML = `${base}<sup>${currentInput}</sup>`;
-        } else {
-            // Zamiana symboli operatorów na te widoczne dla użytkownika
-            let displayExpression = expression.replace(/\*\*/g, '^').replace(/\*/g, '×').replace(/\//g, '÷');
-            display.textContent = displayExpression + currentInput;
-            if (expression === '' && currentInput === '0') {
-                 display.textContent = '0';
-            }
-        }
-    };
+    const updateDisplay = () => { display.textContent = currentInput; };
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    const calcBgColor = document.getElementById('calc-bg-color');
+    const btnBgColor = document.getElementById('btn-bg-color');
+    const opBtnColor = document.getElementById('op-btn-color');
 
-    // Obsługuje kliknięcia przycisków numerycznych
+    settingsBtn.addEventListener('click', () => { settingsPanel.style.display = 'flex';});
+    closeSettingsBtn.addEventListener('click', () => { settingsPanel.style.display = 'none'; });
+    calcBgColor.addEventListener('input', (e) => { document.querySelector('.calculator-layout').style.backgroundColor = e.target.value;});
+    btnBgColor.addEventListener('input', (e) => { document.querySelectorAll('.btn-number, .btn-decimal, .btn-clear, .btn-negate').forEach(btn => { btn.style.backgroundColor = e.target.value; });});
+    opBtnColor.addEventListener('input', (e) => { document.querySelectorAll('.btn-operator, .btn-equal').forEach(btn => { btn.style.backgroundColor = e.target.value; });});
+
     const handleNumber = (number) => {
-        if (isExponentMode) {
-            currentInput += number;
-        } else {
-            if (currentInput === '0' && number !== '.') {
-                currentInput = number;
-            } else {
-                currentInput += number;
-            }
-        }
+        if (waitingForSecondOperand) {
+            currentInput = number;
+            waitingForSecondOperand = false;
+        } else currentInput = currentInput === '0' ? number : currentInput + number;
+        
         updateDisplay();
     };
 
-    // Obsługuje operatory matematyczne (+, -, *, /)
-    const handleOperator = (op) => {
-        if (isExponentMode) {
-            expression += `**${currentInput}`;
-            isExponentMode = false;
-            powerToggleButton.textContent = 'x^y';
-        } else {
-            expression += currentInput;
+    const handleDecimal = () => {
+        if (waitingForSecondOperand) {
+            currentInput = '0.';
+            waitingForSecondOperand = false;
+            updateDisplay();
+            return;
         }
-        expression += op;
-        currentInput = '0';
+        if (!currentInput.includes('.')) currentInput += '.';
+        
         updateDisplay();
     };
 
-    // Obsługuje przycisk równości
+    const handleOperator = (nextOperator) => {
+        const inputValue = parseFloat(currentInput);
+
+        if (operator && waitingForSecondOperand) {
+            operator = nextOperator;
+            return;
+        }
+
+        if (firstOperand === null) firstOperand = inputValue;
+        else if (operator) {
+            const result = performCalculation[operator](firstOperand, inputValue);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = parseFloat(currentInput);
+        }
+
+        waitingForSecondOperand = true;
+        operator = nextOperator;
+        updateDisplay();
+    };
+
+    const performCalculation = {
+        '÷': (first, second) => second === 0 ? 'Error' : first / second,
+        '×': (first, second) => first * second,
+        '-': (first, second) => first - second,
+        '+': (first, second) => first + second
+    };
+
     const handleEquals = () => {
-        if (isExponentMode) {
-            expression += `**${currentInput}`;
-            isExponentMode = false;
-            powerToggleButton.textContent = 'x^y';
-        } else {
-             expression += currentInput;
-        }
-       
-        try {
-            // Obliczenie wyrażenia, zamieniając symbole na format JS
-            const result = eval(expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**'));
-            currentInput = result.toString();
-            expression = '';
-            updateDisplay();
-        } catch (e) {
-            currentInput = 'Error';
-            expression = '';
+        if (operator && !waitingForSecondOperand) {
+            const secondOperand = parseFloat(currentInput);
+            const result = performCalculation[operator](firstOperand, secondOperand);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = null;
+            operator = null;
+            waitingForSecondOperand = false;
             updateDisplay();
         }
     };
 
-    // Obsługuje przycisk czyszczenia (AC)
     const handleClear = () => {
         currentInput = '0';
-        expression = '';
-        isExponentMode = false;
-        base = null;
-        powerToggleButton.textContent = 'x^y';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
         updateDisplay();
     };
 
-    // Obsługuje przycisk zmiany znaku (+/-)
     const handleNegate = () => {
         currentInput = (parseFloat(currentInput) * -1).toString();
         updateDisplay();
     };
 
-    // Obsługa operacji bocznych (sin, cos, tg, itd.)
+    const handlePercent = () => {
+        currentInput = (parseFloat(currentInput) / 100).toString();
+        if (operator) {
+            const inputValue = parseFloat(currentInput);
+            const result = performCalculation[operator](firstOperand, inputValue);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = parseFloat(currentInput);
+            operator = null;
+        }
+        updateDisplay();
+    };
+
     const handleSideOperation = (formula) => {
         let x = parseFloat(currentInput);
         let result;
         try {
             const evaluatedFormula = formula.replace(/x/g, x);
             result = eval(evaluatedFormula);
-            if (result === Infinity || result === -Infinity || isNaN(result)) {
-                result = 'Error';
-            } else {
-                result = parseFloat(result.toFixed(7));
-            }
+            if (result === Infinity || result === -Infinity || isNaN(result)) result = 'Error';
+            else result = parseFloat(result.toFixed(7));
+            
         } catch (e) {
             result = 'Error';
         }
         currentInput = result.toString();
-        expression = '';
-        isExponentMode = false;
-        base = null;
-        powerToggleButton.textContent = 'x^y';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
         updateDisplay();
     };
 
-    // Obsługa przełącznika potęgi
-    const handlePowerToggle = () => {
-        if (!isExponentMode) {
-            if (currentInput !== '0') {
-                base = currentInput;
-                isExponentMode = true;
-                currentInput = '';
-                powerToggleButton.textContent = 'x↓';
-                updateDisplay();
-            }
-        } else {
-            // Wychodzenie z trybu wykładnika
-            expression += `${base}**${currentInput}`;
-            isExponentMode = false;
-            currentInput = '0';
-            base = null;
-            powerToggleButton.textContent = 'x^y';
-            updateDisplay();
-        }
-    };
-
-    // Dodaje nasłuchiwacze zdarzeń kliknięcia do wszystkich przycisków
     buttons.forEach(button => {
         button.addEventListener('click', () => {
             const buttonText = button.textContent;
             
-            if (button.classList.contains('btn-number')) {
-                handleNumber(buttonText);
-            } else if (button.id === 'btn-dot') {
-                handleNumber('.');
-            } else if (button.id === 'btn-clear') {
-                handleClear();
-            } else if (button.id === 'btn-calculate') {
-                handleEquals();
-            } else if (button.id === 'btn-power-toggle') {
-                handlePowerToggle();
-            } else if (button.classList.contains('btn-operator')) {
-                 if (['sin', 'cos', 'tg', 'ctg', '√x'].includes(buttonText)) {
+            if (button.classList.contains('btn-number')) handleNumber(buttonText);
+            else if (button.id === 'btn-dot') handleDecimal();
+            else if (button.id === 'btn-clear') handleClear();
+            else if (button.id === 'btn-negate') handleNegate();
+            else if (button.id === 'btn-percent') handlePercent();
+            else if (button.classList.contains('btn-operator')) {
+                if (['sin', 'cos', 'tg', 'ctg', 'x²', '√x'].includes(buttonText)) {
                     const formula = button.getAttribute('data-formula');
-                    if (formula) {
-                        handleSideOperation(formula);
-                    }
-                } else if (button.id === 'btn-negate') {
-                    handleNegate();
-                } else {
-                    handleOperator(buttonText);
-                }
-            }
+                    if (formula) handleSideOperation(formula);
+                } 
+                else if (button.id === 'btn-divide') handleOperator('÷');
+                else if (button.id === 'btn-multiply') handleOperator('×');
+                else if (button.id === 'btn-subtract') handleOperator('-');
+                else if (button.id === 'btn-add') handleOperator('+');
+                
+            } 
+            else if (button.id === 'btn-calculate') handleEquals();
+            
         });
+    });
+
+    // Obsługa klawiatury
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+
+        if (/\d/.test(key)) handleNumber(key);
+        else if (key === '.') handleDecimal();
+        else if (key === '+' || key === '-') {
+            e.preventDefault();
+            handleOperator(key);
+        } else if (key === '*' || key ===toLowerCase() === 'x') {
+            e.preventDefault();
+            handleOperator('×');
+        } else if (key === '/') {
+            e.preventDefault();
+            handleOperator('÷');
+        } 
+        else if (key === 'Enter') handleEquals();
+        else if (key === 'Backspace') {
+            currentInput = currentInput.slice(0, -1) || '0';
+            updateDisplay();
+        } 
+        else if (key === 'Escape') handleClear();
+        
     });
 
     updateDisplay();
