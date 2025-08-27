@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const display = document.querySelector('.display');
     const buttons = document.querySelectorAll('.btn');
-    const settingsButton = document.getElementById('btn-settings');
-    let settingsPanel = null;
+    const themeToggleButton = document.getElementById('btn-theme-toggle');
 
     let currentInput = '0';
     let firstOperand = null;
@@ -14,52 +13,32 @@ document.addEventListener('DOMContentLoaded', () => {
         display.textContent = currentInput;
     };
 
-    // Obsługa dynamicznego panelu konfiguracji
-    const createSettingsPanel = () => {
-        if (settingsPanel) {
-            // Jeśli panel już istnieje, po prostu go pokaż
-            settingsPanel.style.display = 'flex';
-            return;
-        }
+    // Funkcja do wyświetlania powiadomień
+    const showNotification = (message) => {
+        const notification = document.createElement('div');
+        notification.classList.add('notification');
+        notification.textContent = message;
+        document.body.appendChild(notification);
 
-        settingsPanel = document.createElement('div');
-        settingsPanel.classList.add('settings-panel');
-        settingsPanel.innerHTML = `
-            <h3>Konfiguracja</h3>
-            <label for="calc-bg-color">Tło kalkulatora:</label>
-            <input type="color" id="calc-bg-color" value="#ffffff">
-            <label for="btn-bg-color">Kolor przycisków:</label>
-            <input type="color" id="btn-bg-color" value="#f0f0f0">
-            <label for="op-btn-color">Kolor operatorów:</label>
-            <input type="color" id="op-btn-color" value="#ff9500">
-            <button id="close-settings-btn">Zamknij</button>
-        `;
-        document.body.appendChild(settingsPanel);
-
-        const closeSettingsBtn = document.getElementById('close-settings-btn');
-        closeSettingsBtn.addEventListener('click', () => {
-            settingsPanel.style.display = 'none';
-        });
-
-        const calcBgColor = document.getElementById('calc-bg-color');
-        calcBgColor.addEventListener('input', (e) => {
-            document.querySelector('.calculator-layout').style.backgroundColor = e.target.value;
-        });
-
-        const btnBgColor = document.getElementById('btn-bg-color');
-        btnBgColor.addEventListener('input', (e) => {
-            document.querySelectorAll('.btn-number, .btn-decimal, .btn-clear, .btn-negate').forEach(btn => {
-                btn.style.backgroundColor = e.target.value;
+        setTimeout(() => {
+            notification.classList.add('hide');
+            notification.addEventListener('transitionend', () => {
+                notification.remove();
             });
-        });
-
-        const opBtnColor = document.getElementById('op-btn-color');
-        opBtnColor.addEventListener('input', (e) => {
-            document.querySelectorAll('.btn-operator, .btn-equal').forEach(btn => {
-                btn.style.backgroundColor = e.target.value;
-            });
-        });
+        }, 2000);
     };
+
+    // Obsługa przełączania trybu nocnego/dziennego
+    themeToggleButton.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            themeToggleButton.textContent = '☀️';
+            showNotification('Tryb nocny włączony.');
+        } else {
+            themeToggleButton.textContent = '🌙';
+            showNotification('Tryb dzienny włączony.');
+        }
+    });
 
     // Obsługuje kliknięcia przycisków numerycznych
     const handleNumber = (number) => {
@@ -194,8 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleNegate();
             } else if (button.id === 'btn-percent') {
                 handlePercent();
-            } else if (button.id === 'btn-settings') {
-                createSettingsPanel();
+            } else if (button.id === 'btn-theme-toggle') {
+                // Ta logika jest już poza pętlą
             } else if (button.classList.contains('btn-operator')) {
                 if (['sin', 'cos', 'tg', 'ctg', 'x²', '√x'].includes(buttonText)) {
                     const formula = button.getAttribute('data-formula');
@@ -220,9 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Obsługa klawiatury
     document.addEventListener('keydown', (e) => {
         const key = e.key;
-        if (settingsPanel && settingsPanel.style.display !== 'none') {
-            return; // Wyjdź, jeśli panel ustawień jest otwarty
-        }
 
         if (/\d/.test(key)) {
             handleNumber(key);
