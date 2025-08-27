@@ -8,16 +8,16 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    
+
 
     <div class="calculator-layout">
         <div class="side-ops">
-            <button class="btn btn-operator" data-action="sin">sin</button>
-            <button class="btn btn-operator" data-action="cos">cos</button>
-            <button class="btn btn-operator" data-action="tan">tg</button>
-            <button class="btn btn-operator" data-action="cot">ctg</button>
-            <button class="btn btn-operator" data-action="square">x²</button>
-            <button class="btn btn-operator" data-action="sqrt">√x</button>
+            <button id="btn-sin" class="btn btn-operator" data-formula="Math.sin(x * Math.PI / 180)">sin</button>
+            <button id="btn-cos" class="btn btn-operator" data-formula="Math.cos(x * Math.PI / 180)">cos</button>
+            <button id="btn-tan" class="btn btn-operator" data-formula="Math.tan(x * Math.PI / 180)">tg</button>
+            <button id="btn-cot" class="btn btn-operator" data-formula="1 / Math.tan(x * Math.PI / 180)">ctg</button>
+            <button id="btn-square" class="btn btn-operator" data-formula="x ** 2">x²</button>
+            <button id="btn-sqrt" class="btn btn-operator" data-formula="x < 0 ? 'Error' : Math.sqrt(x)">√x</button>
         </div>
         <div class="calculator">
             <div class="display">0</div>

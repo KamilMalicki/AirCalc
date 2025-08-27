@@ -9,34 +9,41 @@ let firstValue = '';
 let operator = '';
 let secondValue = '';
 
-// Single-argument calculator functions
-const calcFunctions = {
-    sin: x => Math.sin(x * Math.PI / 180),
-    cos: x => Math.cos(x * Math.PI / 180),
-    tan: x => Math.tan(x * Math.PI / 180),
-    cot: x => {
-        const t = Math.tan(x * Math.PI / 180);
-        return t === 0 ? 'Error' : 1 / t;
-    },
-    square: x => x ** 2,
-    sqrt: x => x < 0 ? 'Error' : Math.sqrt(x),
-};
 
-// Two-argument operations
-const basicOps = {
-    add: (a, b) => a + b,
-    subtract: (a, b) => a - b,
-    multiply: (a, b) => a * b,
-    divide: (a, b) => b === 0 ? 'Error' : a / b,
-    percent: a => a / 100,
-};
+const display = document.querySelector('.display');
+const buttons = document.querySelector('.buttons');
+const sideOps = document.querySelector('.side-ops');
 
+let shouldResetDisplay = false;
+let firstValue = '';
+let operator = '';
+let secondValue = '';
+
+// Add event listeners for function buttons in side-ops
+['btn-sin','btn-cos','btn-tan','btn-cot','btn-square','btn-sqrt'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+        btn.addEventListener('click', function() {
+            let x = parseFloat(display.textContent);
+            if (isNaN(x)) x = 0;
+            let formula = btn.getAttribute('data-formula');
+            try {
+                let result = eval(formula);
+                display.textContent = result.toString();
+            } catch(e) {
+                display.textContent = 'Error';
+            }
+            shouldResetDisplay = true;
+        });
+    }
+});
+
+// Keep basic calculator logic for number and operator buttons
 function handleButtonAction(target) {
     if (!target.matches('button')) return;
     const value = target.textContent;
     const action = target.dataset.action;
 
-    // Number input
     if (!action) {
         if (shouldResetDisplay) {
             display.textContent = value;
@@ -47,7 +54,6 @@ function handleButtonAction(target) {
         return;
     }
 
-    // Clear
     if (action === 'clear') {
         display.textContent = '0';
         firstValue = '';
@@ -57,7 +63,6 @@ function handleButtonAction(target) {
         return;
     }
 
-    // Decimal
     if (action === 'decimal') {
         if (shouldResetDisplay) {
             display.textContent = '0.';
@@ -68,7 +73,6 @@ function handleButtonAction(target) {
         return;
     }
 
-    // Negate
     if (action === 'negate') {
         let currentValue = parseFloat(display.textContent);
         if (!isNaN(currentValue)) {
@@ -77,33 +81,32 @@ function handleButtonAction(target) {
         return;
     }
 
-    // Percent
     if (action === 'percent') {
         let currentValue = parseFloat(display.textContent);
         if (!isNaN(currentValue)) {
-            display.textContent = basicOps.percent(currentValue).toString();
+            display.textContent = (currentValue / 100).toString();
             shouldResetDisplay = true;
         }
         return;
     }
 
-    // Single-argument functions (sin, cos, tan, cot, square, sqrt)
-    if (calcFunctions[action]) {
-        let currentValue = parseFloat(display.textContent);
-        if (isNaN(currentValue)) currentValue = 0;
-        let result = calcFunctions[action](currentValue);
-        display.textContent = result.toString();
-        shouldResetDisplay = true;
-        return;
-    }
-
-    // Two-argument operations (+, -, *, /)
-    if (['add', 'subtract', 'multiply', 'divide'].includes(action)) {
+    if (
+        action === 'add' ||
+        action === 'subtract' ||
+        action === 'multiply' ||
+        action === 'divide'
+    ) {
         if (firstValue && operator && !shouldResetDisplay) {
             secondValue = display.textContent;
             let a = parseFloat(firstValue);
             let b = parseFloat(secondValue);
-            let result = basicOps[operator](a, b);
+            let result;
+            switch (action) {
+                case 'add': result = a + b; break;
+                case 'subtract': result = a - b; break;
+                case 'multiply': result = a * b; break;
+                case 'divide': result = b === 0 ? 'Error' : a / b; break;
+            }
             display.textContent = result.toString();
             firstValue = result;
         } else {
@@ -114,13 +117,18 @@ function handleButtonAction(target) {
         return;
     }
 
-    // Equals
     if (action === 'calculate') {
         if (firstValue && operator) {
             secondValue = display.textContent;
             let a = parseFloat(firstValue);
             let b = parseFloat(secondValue);
-            let result = basicOps[operator](a, b);
+            let result;
+            switch (operator) {
+                case 'add': result = a + b; break;
+                case 'subtract': result = a - b; break;
+                case 'multiply': result = a * b; break;
+                case 'divide': result = b === 0 ? 'Error' : a / b; break;
+            }
             display.textContent = result.toString();
             firstValue = '';
             operator = '';
@@ -132,10 +140,6 @@ function handleButtonAction(target) {
 }
 
 buttons.addEventListener('click', (event) => {
-    handleButtonAction(event.target);
-});
-
-sideOps.addEventListener('click', (event) => {
     handleButtonAction(event.target);
 });
 
