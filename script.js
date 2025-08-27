@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const display = document.querySelector('.display');
     const buttons = document.querySelectorAll('.btn');
-    const themeToggleButton = document.getElementById('btn-theme-toggle');
+    const settingsButton = document.getElementById('btn-settings');
+    let settingsPanel = null;
 
     let currentInput = '0';
     let firstOperand = null;
@@ -11,21 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Aktualizuje wyświetlacz kalkulatora
     const updateDisplay = () => {
         display.textContent = currentInput;
-    };
-
-    // Funkcja do wyświetlania powiadomień
-    const showNotification = (message) => {
-        const notification = document.createElement('div');
-        notification.classList.add('notification');
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.classList.add('hide');
-            notification.addEventListener('transitionend', () => {
-                notification.remove();
-            });
-        }, 2000);
     };
 
     // Obsługuje kliknięcia przycisków numerycznych
@@ -161,8 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleNegate();
             } else if (button.id === 'btn-percent') {
                 handlePercent();
-            } else if (button.id === 'btn-theme-toggle') {
-                // Ta logika jest już poza pętlą
+            } else if (button.id === 'btn-settings') {
+                createSettingsPanel();
             } else if (button.classList.contains('btn-operator')) {
                 if (['sin', 'cos', 'tg', 'ctg', 'x²', '√x'].includes(buttonText)) {
                     const formula = button.getAttribute('data-formula');
@@ -187,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Obsługa klawiatury
     document.addEventListener('keydown', (e) => {
         const key = e.key;
-
+        
         if (/\d/.test(key)) {
             handleNumber(key);
         } else if (key === '.') {
