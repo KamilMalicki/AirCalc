@@ -1,19 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const display = document.querySelector('.display');
     const buttons = document.querySelectorAll('.btn');
-    const sideOps = document.querySelectorAll('.side-ops .btn');
 
     let currentInput = '0';
     let firstOperand = null;
     let operator = null;
     let waitingForSecondOperand = false;
 
-    // Updates the calculator display
+    // Aktualizuje wyświetlacz kalkulatora
     const updateDisplay = () => {
         display.textContent = currentInput;
     };
 
-    // Handles number button clicks
+    // Obsługuje kliknięcia przycisków numerycznych
     const handleNumber = (number) => {
         if (waitingForSecondOperand) {
             currentInput = number;
@@ -24,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     };
 
-    // Handles decimal point button click
+    // Obsługuje kliknięcie przycisku z kropką dziesiętną
     const handleDecimal = () => {
         if (waitingForSecondOperand) {
             currentInput = '0.';
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     };
 
-    // Handles operator button clicks (+, -, ×, ÷)
+    // Obsługuje kliknięcia przycisków operatorów (+, -, ×, ÷, %)
     const handleOperator = (nextOperator) => {
         const inputValue = parseFloat(currentInput);
 
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     };
 
-    // Object containing calculation functions
+    // Obiekt zawierający funkcje obliczeniowe
     const performCalculation = {
         '÷': (first, second) => second === 0 ? 'Error' : first / second,
         '×': (first, second) => first * second,
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '%': (first, second) => first % second,
     };
 
-    // Handles the equals button
+    // Obsługuje przycisk równości
     const handleEquals = () => {
         if (operator && !waitingForSecondOperand) {
             const secondOperand = parseFloat(currentInput);
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Handles the clear button (AC)
+    // Obsługuje przycisk czyszczenia (AC)
     const handleClear = () => {
         currentInput = '0';
         firstOperand = null;
@@ -91,20 +90,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     };
 
-    // Handles the negate button (+/-)
+    // Obsługuje przycisk zmiany znaku (+/-)
     const handleNegate = () => {
         currentInput = (parseFloat(currentInput) * -1).toString();
         updateDisplay();
     };
 
-    // Handles the trigonometric and other side operations
+    // Obsługuje operacje boczne (sin, cos, tg, itd.)
     const handleSideOperation = (formula) => {
         let x = parseFloat(currentInput);
         let result;
         try {
-            // Replaces the placeholder 'x' with the current input value
             const evaluatedFormula = formula.replace(/x/g, x);
-            // Uses eval() to execute the mathematical formula string
             result = eval(evaluatedFormula);
             if (result === Infinity || result === -Infinity || isNaN(result)) {
                 result = 'Error';
@@ -121,19 +118,22 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     };
 
-    // Adds click event listeners to all buttons
+    // Dodaje nasłuchiwacze zdarzeń kliknięcia do wszystkich przycisków
     buttons.forEach(button => {
         button.addEventListener('click', () => {
+            const buttonText = button.textContent;
+            
             if (button.classList.contains('btn-number')) {
-                handleNumber(button.textContent);
+                handleNumber(buttonText);
             } else if (button.id === 'btn-dot') {
                 handleDecimal();
-            } else if (button.id === 'btn-clear') {
-                handleClear();
-            } else if (button.id === 'btn-negate') {
-                handleNegate();
             } else if (button.classList.contains('btn-operator')) {
-                if (button.id === 'btn-percent') {
+                if (['sin', 'cos', 'tg', 'ctg', 'x²', '√x'].includes(buttonText)) {
+                    const formula = button.getAttribute('data-formula');
+                    if (formula) {
+                        handleSideOperation(formula);
+                    }
+                } else if (button.id === 'btn-percent') {
                     handleOperator('%');
                 } else if (button.id === 'btn-divide') {
                     handleOperator('÷');
@@ -146,20 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (button.id === 'btn-calculate') {
                 handleEquals();
+            } else if (button.id === 'btn-clear') {
+                handleClear();
+            } else if (button.id === 'btn-negate') {
+                handleNegate();
             }
         });
     });
 
-    // Adds click event listeners to the side operations buttons
-    sideOps.forEach(button => {
-        button.addEventListener('click', () => {
-            const formula = button.getAttribute('data-formula');
-            if (formula) {
-                handleSideOperation(formula);
-            }
-        });
-    });
-
-    // Initial display update
     updateDisplay();
 });
