@@ -1,255 +1,165 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const display = document.querySelector('.display');
+    const buttons = document.querySelectorAll('.btn');
+    const sideOps = document.querySelectorAll('.side-ops .btn');
 
+    let currentInput = '0';
+    let firstOperand = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
 
-const display = document.querySelector('.display');
-const buttons = document.querySelector('.buttons');
-const sideOps = document.querySelector('.side-ops');
+    // Updates the calculator display
+    const updateDisplay = () => {
+        display.textContent = currentInput;
+    };
 
-let shouldResetDisplay = false;
-let firstValue = '';
-let operator = '';
-let secondValue = '';
-
-
-const display = document.querySelector('.display');
-const buttons = document.querySelector('.buttons');
-const sideOps = document.querySelector('.side-ops');
-
-let shouldResetDisplay = false;
-let firstValue = '';
-let operator = '';
-let secondValue = '';
-
-// Add event listeners for function buttons in side-ops
-['btn-sin','btn-cos','btn-tan','btn-cot','btn-square','btn-sqrt'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-        btn.addEventListener('click', function() {
-            let x = parseFloat(display.textContent);
-            if (isNaN(x)) x = 0;
-            let formula = btn.getAttribute('data-formula');
-            try {
-                let result = eval(formula);
-                display.textContent = result.toString();
-            } catch(e) {
-                display.textContent = 'Error';
-            }
-            shouldResetDisplay = true;
-        });
-    }
-});
-
-// Keep basic calculator logic for number and operator buttons
-function handleButtonAction(target) {
-    if (!target.matches('button')) return;
-    const value = target.textContent;
-    const action = target.dataset.action;
-
-    if (!action) {
-        if (shouldResetDisplay) {
-            display.textContent = value;
-            shouldResetDisplay = false;
+    // Handles number button clicks
+    const handleNumber = (number) => {
+        if (waitingForSecondOperand) {
+            currentInput = number;
+            waitingForSecondOperand = false;
         } else {
-            display.textContent = display.textContent === '0' ? value : display.textContent + value;
+            currentInput = currentInput === '0' ? number : currentInput + number;
         }
-        return;
-    }
+        updateDisplay();
+    };
 
-    if (action === 'clear') {
-        display.textContent = '0';
-        firstValue = '';
-        operator = '';
-        secondValue = '';
-        shouldResetDisplay = false;
-        return;
-    }
-
-    if (action === 'decimal') {
-        if (shouldResetDisplay) {
-            display.textContent = '0.';
-            shouldResetDisplay = false;
-        } else if (!display.textContent.includes('.')) {
-            display.textContent += '.';
+    // Handles decimal point button click
+    const handleDecimal = () => {
+        if (waitingForSecondOperand) {
+            currentInput = '0.';
+            waitingForSecondOperand = false;
+            updateDisplay();
+            return;
         }
-        return;
-    }
-
-    if (action === 'negate') {
-        let currentValue = parseFloat(display.textContent);
-        if (!isNaN(currentValue)) {
-            display.textContent = (-currentValue).toString();
+        if (!currentInput.includes('.')) {
+            currentInput += '.';
         }
-        return;
-    }
+        updateDisplay();
+    };
 
-    if (action === 'percent') {
-        let currentValue = parseFloat(display.textContent);
-        if (!isNaN(currentValue)) {
-            display.textContent = (currentValue / 100).toString();
-            shouldResetDisplay = true;
+    // Handles operator button clicks (+, -, ×, ÷)
+    const handleOperator = (nextOperator) => {
+        const inputValue = parseFloat(currentInput);
+
+        if (operator && waitingForSecondOperand) {
+            operator = nextOperator;
+            return;
         }
-        return;
-    }
 
-    if (
-        action === 'add' ||
-        action === 'subtract' ||
-        action === 'multiply' ||
-        action === 'divide'
-    ) {
-        if (firstValue && operator && !shouldResetDisplay) {
-            secondValue = display.textContent;
-            let a = parseFloat(firstValue);
-            let b = parseFloat(secondValue);
-            let result;
-            switch (action) {
-                case 'add': result = a + b; break;
-                case 'subtract': result = a - b; break;
-                case 'multiply': result = a * b; break;
-                case 'divide': result = b === 0 ? 'Error' : a / b; break;
-            }
-            display.textContent = result.toString();
-            firstValue = result;
-        } else {
-            firstValue = display.textContent;
+        if (firstOperand === null) {
+            firstOperand = inputValue;
+        } else if (operator) {
+            const result = performCalculation[operator](firstOperand, inputValue);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = parseFloat(currentInput);
         }
-        operator = action;
-        shouldResetDisplay = true;
-        return;
-    }
 
-    if (action === 'calculate') {
-        if (firstValue && operator) {
-            secondValue = display.textContent;
-            let a = parseFloat(firstValue);
-            let b = parseFloat(secondValue);
-            let result;
-            switch (operator) {
-                case 'add': result = a + b; break;
-                case 'subtract': result = a - b; break;
-                case 'multiply': result = a * b; break;
-                case 'divide': result = b === 0 ? 'Error' : a / b; break;
-            }
-            display.textContent = result.toString();
-            firstValue = '';
-            operator = '';
-            secondValue = '';
-            shouldResetDisplay = true;
+        waitingForSecondOperand = true;
+        operator = nextOperator;
+        updateDisplay();
+    };
+
+    // Object containing calculation functions
+    const performCalculation = {
+        '÷': (first, second) => second === 0 ? 'Error' : first / second,
+        '×': (first, second) => first * second,
+        '-': (first, second) => first - second,
+        '+': (first, second) => first + second,
+        '%': (first, second) => first % second,
+    };
+
+    // Handles the equals button
+    const handleEquals = () => {
+        if (operator && !waitingForSecondOperand) {
+            const secondOperand = parseFloat(currentInput);
+            const result = performCalculation[operator](firstOperand, secondOperand);
+            currentInput = `${parseFloat(result.toFixed(7))}`;
+            firstOperand = null;
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
         }
-        return;
-    }
-}
+    };
 
-buttons.addEventListener('click', (event) => {
-    handleButtonAction(event.target);
-});
+    // Handles the clear button (AC)
+    const handleClear = () => {
+        currentInput = '0';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
+        updateDisplay();
+    };
 
-function updateDisplay(value) {
-    display.textContent = value.toString().substring(0, 10);
-}
+    // Handles the negate button (+/-)
+    const handleNegate = () => {
+        currentInput = (parseFloat(currentInput) * -1).toString();
+        updateDisplay();
+    };
 
-
-function handleButtonAction(target) {
-    if (!target.matches('button')) return;
-    const value = target.textContent;
-    const action = target.dataset.action;
-
-    if (!action) {
-        if (shouldResetDisplay) {
-            display.textContent = value;
-            shouldResetDisplay = false;
-        } else {
-            display.textContent = display.textContent === '0' ? value : display.textContent + value;
-        }
-        return;
-    }
-
-    if (action === 'clear') {
-        display.textContent = '0';
-        firstValue = '';
-        operator = '';
-        secondValue = '';
-        shouldResetDisplay = false;
-        return;
-    }
-
-    if (action === 'decimal') {
-        if (shouldResetDisplay) {
-            display.textContent = '0.';
-            shouldResetDisplay = false;
-        } else if (!display.textContent.includes('.')) {
-            display.textContent += '.';
-        }
-        return;
-    }
-
-    if (action === 'negate') {
-        let currentValue = parseFloat(display.textContent);
-        if (!isNaN(currentValue)) {
-            currentValue = currentValue * -1;
-            updateDisplay(currentValue);
-        }
-        return;
-    }
-
-    if (action === 'percent') {
-        let currentValue = parseFloat(display.textContent);
-        if (!isNaN(currentValue)) {
-            let result = operate('%', currentValue);
-            updateDisplay(result);
-        }
-        return;
-    }
-
-    if (action === 'sqrt') {
-        let currentValue = parseFloat(display.textContent);
-        if (!isNaN(currentValue)) {
-            if (currentValue < 0) {
-                display.textContent = 'Error';
+    // Handles the trigonometric and other side operations
+    const handleSideOperation = (formula) => {
+        let x = parseFloat(currentInput);
+        let result;
+        try {
+            // Replaces the placeholder 'x' with the current input value
+            const evaluatedFormula = formula.replace(/x/g, x);
+            // Uses eval() to execute the mathematical formula string
+            result = eval(evaluatedFormula);
+            if (result === Infinity || result === -Infinity || isNaN(result)) {
+                result = 'Error';
             } else {
-                display.textContent = Math.sqrt(currentValue).toString();
+                result = parseFloat(result.toFixed(7));
             }
-            shouldResetDisplay = true;
+        } catch (e) {
+            result = 'Error';
         }
-        return;
-    }
+        currentInput = result.toString();
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
+        updateDisplay();
+    };
 
-    if (
-        action === 'add' ||
-        action === 'subtract' ||
-        action === 'multiply' ||
-        action === 'divide'
-    ) {
-        if (firstValue && operator && !shouldResetDisplay) {
-            secondValue = display.textContent;
-            const result = operate(operator, firstValue, secondValue);
-            updateDisplay(result);
-            firstValue = result;
-        } else {
-            firstValue = display.textContent;
-        }
-        operator = value;
-        shouldResetDisplay = true;
-        return;
-    }
+    // Adds click event listeners to all buttons
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.classList.contains('btn-number')) {
+                handleNumber(button.textContent);
+            } else if (button.id === 'btn-dot') {
+                handleDecimal();
+            } else if (button.id === 'btn-clear') {
+                handleClear();
+            } else if (button.id === 'btn-negate') {
+                handleNegate();
+            } else if (button.classList.contains('btn-operator')) {
+                if (button.id === 'btn-percent') {
+                    handleOperator('%');
+                } else if (button.id === 'btn-divide') {
+                    handleOperator('÷');
+                } else if (button.id === 'btn-multiply') {
+                    handleOperator('×');
+                } else if (button.id === 'btn-subtract') {
+                    handleOperator('-');
+                } else if (button.id === 'btn-add') {
+                    handleOperator('+');
+                }
+            } else if (button.id === 'btn-calculate') {
+                handleEquals();
+            }
+        });
+    });
 
-    if (action === 'calculate') {
-        if (firstValue && operator) {
-            secondValue = display.textContent;
-            const result = operate(operator, firstValue, secondValue);
-            updateDisplay(result);
-            firstValue = '';
-            operator = '';
-            secondValue = '';
-            shouldResetDisplay = true;
-        }
-        return;
-    }
-}
+    // Adds click event listeners to the side operations buttons
+    sideOps.forEach(button => {
+        button.addEventListener('click', () => {
+            const formula = button.getAttribute('data-formula');
+            if (formula) {
+                handleSideOperation(formula);
+            }
+        });
+    });
 
-buttons.addEventListener('click', (event) => {
-    handleButtonAction(event.target);
-});
-
-sideOps.addEventListener('click', (event) => {
-    handleButtonAction(event.target);
+    // Initial display update
+    updateDisplay();
 });
